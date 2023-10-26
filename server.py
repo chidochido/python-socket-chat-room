@@ -2,10 +2,11 @@ import socket
 import threading
 
 host = '127.0.0.1'
-port = 8006
+port = 8002
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((host, port))
 s.listen(0)
+print(f'Server started on port {port}. Accepting connections')
 # TODO: make new thread upon accept
 
 data = 0
@@ -17,6 +18,7 @@ def processClient(conn):
     
     try:
       data = conn.recv(1024)
+      print(data.decode())
     except IOError as e:
       continue
     if not data:

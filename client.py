@@ -4,7 +4,7 @@ import time
 import random
 
 host = '127.0.0.1'
-port = 8006
+port = 8002
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 s.connect((host, port))
