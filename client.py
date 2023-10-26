@@ -5,14 +5,35 @@ import random
 import sys
 import argparse
 
-host = '127.0.0.1'
-port = 8000
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-join', action='store_true')
+parser.add_argument('-host', type=str)
+parser.add_argument('-port', type=int)
+parser.add_argument('-username', type=str)
+parser.add_argument('-passcode', type=str)
+args = parser.parse_args()
+
+host = args.host
+port = args.port
+username = args.username
+passcode = args.passcode
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 s.connect((host, port))
+
+s.send(passcode.encode())
+res = s.recv(1024).decode()
+
+if res == "Incorrect passcode.":
+  print(res)
+  exit()
+
+print(f"Connected to {host} on port {port}")
 s.setblocking(False)
 
-username = '<user' + str(random.randint(0, 1000)) + '>'
+
+displayPrompt = '<' + username + '>'
 
 def receiveMessages():
   while True: 
@@ -30,6 +51,6 @@ while True:
   if userInput == ":)":
     userInput = "[Feeling Happy]"
 
-  data = username + ': ' + userInput
+  data = displayPrompt + ': ' + userInput
   s.send(data.encode())
 

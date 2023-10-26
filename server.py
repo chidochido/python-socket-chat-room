@@ -4,7 +4,21 @@ import sys
 import argparse
 
 host = '127.0.0.1'
-port = 8000
+
+parser = argparse.ArgumentParser()
+# Optional argument
+parser.add_argument('-start', action='store_true')
+parser.add_argument('-port', type=int)
+parser.add_argument('-passcode', type=str)
+args = parser.parse_args()
+
+port = args.port
+passcode = args.passcode
+
+
+if (len(passcode) > 5):
+  exit()
+
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((host, port))
 s.listen(0)
@@ -17,6 +31,13 @@ socketArray = []
 
 def processClient(conn):
   keepReceiving = True
+  attemptedPass = conn.recv(1024).decode()
+  if attemptedPass != passcode:
+    keepReceiving = False
+    conn.send("Incorrect passcode.".encode())
+  else:
+    conn.send("Good pass".encode())
+  print("responded to client")
   while keepReceiving:
     
     try:
@@ -30,7 +51,8 @@ def processClient(conn):
     else:
       for socket in socketArray:
         if socket != conn:
-          socket.send(data)      
+          socket.send(data)    
+  conn.close()  
 
 while True:
   conn, addr = s.accept() # conn is new socket for this connection
