@@ -10,16 +10,14 @@ s.listen(0)
 def receive(conn):
   keepReceiving = True
   while keepReceiving:
-    data = conn.recv(10)
+    data = conn.recv(1024)
     if not data:
       keepReceiving = False
     else:
-      print(data)           # receive 10 bytes
+      print(data)           
 
 while True:
   conn, addr = s.accept() # conn is new socket for this connection
   conn
   threading.Thread(target = receive, args=(conn,)).start()
 
-
-# print(conn.recv(10))           # receive 10 bytes
