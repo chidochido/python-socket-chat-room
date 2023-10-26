@@ -8,12 +8,17 @@ s.bind((host, port))
 s.listen(0)
 # TODO: make new thread upon accept
 def receive(conn):
-  while True:
-    print(conn.recv(10))           # receive 10 bytes
-
+  keepReceiving = True
+  while keepReceiving:
+    data = conn.recv(10)
+    if not data:
+      keepReceiving = False
+    else:
+      print(data)           # receive 10 bytes
 
 while True:
   conn, addr = s.accept() # conn is new socket for this connection
+  conn
   threading.Thread(target = receive, args=(conn,)).start()
 
 
