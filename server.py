@@ -37,7 +37,12 @@ def processClient(conn):
     conn.send("Incorrect passcode.".encode())
   else:
     conn.send("Good pass".encode())
-  print("responded to client")
+  user = conn.recv(1024).decode()
+  print(f'{user} joined the chat room')
+  for socket in socketArray:
+    if socket != conn:
+      socket.send(f'{user} joined the chat room'.encode())
+      
   while keepReceiving:
     
     try:
