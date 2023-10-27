@@ -15,7 +15,7 @@ def getDayOfWeek(weekday):
   elif weekday == 2:
     return 'Wed'
   elif weekday == 3:
-    return 'Thurs'
+    return 'Thur'
   elif weekday == 4:
     return 'Fri'
   elif weekday == 5:
@@ -68,16 +68,17 @@ s.connect((host, port))
 s.send(passcode.encode())
 res = s.recv(1024).decode()
 
-if res == "Incorrect passcode.":
+if res == "Incorrect passcode":
   print(res)
   sys.stdout.flush()
   exit()
 s.send(username.encode())
 print(f"Connected to {host} on port {port}")
+sys.stdout.flush()
 s.setblocking(False)
 
 
-displayPrompt = '<' + username + '>'
+displayPrompt = username
 
 
 
@@ -90,23 +91,28 @@ def receiveMessages():
     except IOError as e:
       continue
 
-threading.Thread(target = receiveMessages).start()
+threading.Thread(target = receiveMessages, daemon=True).start()
 while True:
-  userInput = input("")
+  userInput = ""
+  try:
+    userInput = input("")
+  except EOFError:
+    pass
   data = None
   if userInput == ":)":
-    userInput = "[Feeling Happy]"
+    userInput = "[feeling happy]"
   elif userInput == ":(":
-    userInput = "[Feeling Sad]"
+    userInput = "[feeling sad]"
   elif userInput == ":mytime":
     now = datetime.datetime.now()
-    mytime = getDayOfWeek(now.weekday()) + ' ' + getMonth(now.month) + ' ' + str(now.day) + ' ' + str(now.strftime('%H:%M:%S')) + ' ' + str(now.year)
+    mytime = getDayOfWeek(now.weekday()) + ' ' + getMonth(now.month) + ' ' + str(now.day) + ' ' + now.strftime('%H:%M:%S') + ' ' + str(now.year)
     userInput = mytime
   elif userInput == ":+1hr":
     now = datetime.datetime.now()
-    mytime = getDayOfWeek(now.weekday()) + ' ' + getMonth(now.month) + ' ' + str(now.day) + ' ' + str((now + datetime.timedelta(hours=1)).strftime('%H:%M:%S')) + ' ' + str(now.year)
+    timeHourLater = getDayOfWeek(now.weekday()) + ' ' + getMonth(now.month) + ' ' + str(now.day) + ' ' + (now + datetime.timedelta(hours=1)).strftime('%H:%M:%S') + ' ' + str(now.year)
+    userInput = timeHourLater
+  elif userInput == ":Exit":
+    exit()
 
-    userInput = mytime
   data = displayPrompt + ': ' + userInput
   s.send(data.encode())
-

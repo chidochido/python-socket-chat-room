@@ -34,25 +34,33 @@ def processClient(conn):
   attemptedPass = conn.recv(1024).decode()
   if attemptedPass != passcode:
     keepReceiving = False
-    conn.send("Incorrect passcode.".encode())
+    conn.send("Incorrect passcode".encode())
   else:
     conn.send("Good pass".encode())
   user = conn.recv(1024).decode()
-  print(f'{user} joined the chat room')
+  print(f'{user} joined the chatroom')
+  sys.stdout.flush()
   for socket in socketArray:
     if socket != conn:
-      socket.send(f'{user} joined the chat room'.encode())
+      socket.send(f'{user} joined the chatroom'.encode())
       
   while keepReceiving:
     
     try:
       data = conn.recv(1024)
-      print(data.decode())
+      if data:
+        print(data.decode())
       sys.stdout.flush()
     except IOError as e:
       continue
     if not data:
+      socketArray.remove(conn)
       keepReceiving = False
+      print(f'{user} left the chatroom')
+      sys.stdout.flush()
+      for socket in socketArray:
+        if socket != conn:
+          socket.send(f"{user} left the chatroom".encode())   
     else:
       for socket in socketArray:
         if socket != conn:
@@ -63,4 +71,3 @@ while True:
   conn, addr = s.accept() # conn is new socket for this connection
   socketArray.append(conn)
   threading.Thread(target = processClient, args=(conn,)).start()
-
